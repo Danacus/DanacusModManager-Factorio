@@ -24,7 +24,7 @@ export default class TabsNav extends React.Component {
     this.state = {
       slideIndex: 0,
     }
-    this.handleChange = (value) => {
+    this.handleChange = (event, value) => {
       this.setState({
         slideIndex: value,
       })
@@ -36,12 +36,13 @@ export default class TabsNav extends React.Component {
       <div>
         <Tabs
           onChange={this.handleChange}
-          value={this.state.slideIndex}
+          index={this.state.slideIndex}
+          fullWidth
         >
-          <Tab label="News" value={0} />
-          <Tab label="Installed Mods" value={1} />
-          <Tab label="Online Mods" value={2} />
-          <Tab label="ModPacks" value={3} />
+          <Tab label="News" />
+          <Tab label="Installed Mods" />
+          <Tab label="Online Mods" />
+          <Tab label="ModPacks" />
         </Tabs>
         <SwipeableViews
           index={this.state.slideIndex}
@@ -52,10 +53,10 @@ export default class TabsNav extends React.Component {
             Welcome to Danacus Mod Manager for Factorio!!!<br />
           </div>
           <div style={styles.slide}>
-            <InstalledMods></InstalledMods>
+
           </div>
           <div style={styles.slide}>
-            <OnlineMods></OnlineMods>
+
           </div>
           <div style={styles.slide}>
             ModPacks

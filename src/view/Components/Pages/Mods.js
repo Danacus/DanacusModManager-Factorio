@@ -1,11 +1,10 @@
 import React from 'react'
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn}
   from 'material-ui/Table'
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField'
-import Toggle from 'material-ui/Toggle'
 import Checkbox from 'material-ui/Checkbox'
-import CircularProgress from 'material-ui/CircularProgress';
+import {CircularProgress} from 'material-ui/Progress'
 import $ from 'jquery'
 import { If, Then, Else } from 'react-if'
 
@@ -158,7 +157,7 @@ export default class InstalledMods extends React.Component {
                   }}
                 >
                   <If condition={ (row.hasUpdate || false) }>
-                    <Then><FlatButton label="Update" onTouchTap={() => ModManager.updateMod(row)} /></Then>
+                    <Then><Button label="Update" onTouchTap={() => ModManager.updateMod(row)} /></Then>
                   </If>
                 </TableRowColumn>
               </TableRow>

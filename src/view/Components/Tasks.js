@@ -1,11 +1,10 @@
 import React from 'react'
 
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
-import Snackbar from 'material-ui/Snackbar'
-import CircularProgress from 'material-ui/CircularProgress'
+import {CircularProgress} from 'material-ui/Progress'
 import { If, Then, Else } from 'react-if'
 import Paper from 'material-ui/Paper'
-import FlatButton from 'material-ui/FlatButton'
+import Button from 'material-ui/Button'
 
 let tasks = []
 let currentId = 0
@@ -158,7 +157,7 @@ export default class Tasks extends React.Component {
         alignItems: 'center',
         justifyContent: 'center',
         background: this.state.background
-      }} zDepth={1}>
+      }}>
         <If condition={ this.state.isLoading }>
           <Then><CircularProgress style={{marginLeft: '10px'}} color={this.state.color} size={20} thickness={2}/></Then>
         </If>
@@ -170,7 +169,7 @@ export default class Tasks extends React.Component {
         </If>
 
         <If condition={ this.state.action != "" }>
-          <Then><FlatButton style={{marginLeft: 'auto', marginRight: '10px'}} label={this.state.action} onTouchTap={() => this.toggleShowMore()}></FlatButton></Then>
+          <Then><Button style={{marginLeft: 'auto', marginRight: '10px'}} label={this.state.action} onTouchTap={() => this.toggleShowMore()}></Button></Then>
           <Else><div style={{marginLeft: 'auto'}}></div></Else>
         </If>
       </Paper>

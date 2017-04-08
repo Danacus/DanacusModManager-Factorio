@@ -1,17 +1,15 @@
 import React from 'react'
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn}
   from 'material-ui/Table'
-import FlatButton from 'material-ui/FlatButton'
+import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
-import Toggle from 'material-ui/Toggle'
 import Checkbox from 'material-ui/Checkbox'
-import CircularProgress from 'material-ui/CircularProgress'
+import {CircularProgress} from 'material-ui/Progress'
 import $ from 'jquery'
 import { If, Then, Else } from 'react-if'
 import semver from 'semver'
 import IconButton from 'material-ui/IconButton'
-import IconMenu from 'material-ui/IconMenu'
-import MenuItem from 'material-ui/MenuItem'
+import {Menu, MenuItem} from 'material-ui/Menu'
 import ModInfo from './ModInfo'
 
 import ModManager from '../../../core/modManager'
@@ -122,7 +120,7 @@ export default class InstalledMods extends React.Component {
                   width: '20px'
                 }}
               >
-                <IconMenu
+                <Menu
                   iconButtonElement={
                     <IconButton
                       iconClassName="material-icons"
@@ -136,7 +134,7 @@ export default class InstalledMods extends React.Component {
                   <MenuItem primaryText="Most Downloads" onTouchTap={() => ModManager.changeOnlineModsSort('top')} />
                   <MenuItem primaryText="Alphabetically" onTouchTap={() => ModManager.changeOnlineModsSort('alpha')} />
                   <MenuItem primaryText="Recently Updated" onTouchTap={() => ModManager.changeOnlineModsSort('updated')} />
-                </IconMenu>
+                </Menu>
 
               </TableRowColumn>
             </TableRow>
@@ -178,10 +176,10 @@ export default class InstalledMods extends React.Component {
                   }}
                 >
                   <If condition={row.hasUpdate}>
-                    <Then><FlatButton label="Update" onTouchTap={() => {
+                    <Then><Button label="Update" onTouchTap={() => {
                       ModManager.updateMod(row)
                     }} /></Then>
-                    <Else><FlatButton label="Download" onTouchTap={() => {
+                    <Else><Button label="Download" onTouchTap={() => {
                       let mod = row
                       mod.version = row.latest_release.version
                       ModManager.downloadMod(mod)

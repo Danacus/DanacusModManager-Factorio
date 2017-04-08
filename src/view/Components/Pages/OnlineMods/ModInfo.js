@@ -1,12 +1,11 @@
 import React from 'react'
 import Drawer from 'material-ui/Drawer'
 import Dialog from 'material-ui/Dialog'
-import FlatButton from 'material-ui/FlatButton'
+import Button from 'material-ui/Button'
 import {List, ListItem} from 'material-ui/List'
 import renderHTML from 'react-render-html'
 import ModManager from '../../../core/modManager'
-import DropDownMenu from 'material-ui/DropDownMenu'
-import MenuItem from 'material-ui/MenuItem'
+import {Menu, MenuItem} from 'material-ui/Menu'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card'
 import { If, Then, Else } from 'react-if'
 
@@ -57,7 +56,7 @@ export default class ModInfo extends React.Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         label="Close"
         primary={false}
         onTouchTap={() => this.close()}
@@ -81,12 +80,12 @@ export default class ModInfo extends React.Component {
               <img src={this.state.mod.media_files[0].urls.original} />
             </CardMedia>
             <CardActions>
-              <DropDownMenu iconStyle={{fill: '#FFB300'}} maxHeight={200} value={this.state.selectedRelease} onChange={(e, i, v) => this.selectVersion(e, i, v)}>
+              <Menu iconStyle={{fill: '#FFB300'}} maxHeight={200} value={this.state.selectedRelease} onChange={(e, i, v) => this.selectVersion(e, i, v)}>
                   {this.state.mod.releases.map((release, index) => (
                     <MenuItem value={index} key={index} primaryText={release.version} />
                   ))}
-              </DropDownMenu>
-              <FlatButton style={{position: 'absolute', marginTop: '8px'}} label="Download" onTouchTap={() => {
+              </Menu>
+              <Button style={{position: 'absolute', marginTop: '8px'}} label="Download" onTouchTap={() => {
                 let mod = this.state.mod
                 mod.version = this.state.mod.releases[this.state.selectedRelease].version
                 ModManager.downloadMod(mod)
@@ -115,13 +114,13 @@ Homepage: <a href={this.state.mod.homepage}>{this.state.mod.homepage}</a><br />
 )]} /></List>
 <List><ListItem primaryText="Releases" onNestedListToggle={() => this.setState({})} nestedItems={this.state.mod.releases.map((release, index) => (
   <ListItem key={index} primaryText={release.version} rightIcon={
-    <FlatButton onTouchTap={() => {
+    <Button onTouchTap={() => {
       let mod = this.state.mod
       mod.version = release.version
       ModManager.downloadMod(mod)
     }}>
       <span style={{fontSize: '12px', marginTop: '-18px', marginLeft: '-32px', position: 'absolute'}}>DOWNLOAD</span>
-    </FlatButton>}
+    </Button>}
   />
 ))} /></List>
 */
