@@ -4,6 +4,7 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 import SwipeableViews from 'react-swipeable-views';
 import InstalledMods from './InstalledMods/InstalledMods'
 import OnlineMods from './OnlineMods/OnlineMods'
+import $ from 'jquery'
 
 const styles = {
   headline: {
@@ -30,14 +31,13 @@ export default class TabsNav extends React.Component {
       })
     }
   }
-
   render() {
     return (
       <div>
         <Tabs
           onChange={this.handleChange}
           index={this.state.slideIndex}
-          fullWidth
+          centered
         >
           <Tab label="News" />
           <Tab label="Installed Mods" />
@@ -53,7 +53,7 @@ export default class TabsNav extends React.Component {
             Welcome to Danacus Mod Manager for Factorio!!!<br />
           </div>
           <div style={styles.slide}>
-
+            <InstalledMods />
           </div>
           <div style={styles.slide}>
 

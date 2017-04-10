@@ -159,7 +159,7 @@ export default class Tasks extends React.Component {
         background: this.state.background
       }}>
         <If condition={ this.state.isLoading }>
-          <Then><CircularProgress style={{marginLeft: '10px'}} color={this.state.color} size={20} thickness={2}/></Then>
+          <Then><CircularProgress style={{marginLeft: '10px'}} color={this.state.color} size={20}/></Then>
         </If>
         <If condition={ this.state.opened == 0 }>
           <Then><p style={{color: this.state.color, margin: '10px 20px 10px 20px', lineHeight: '20px'}}>{this.state.message}</p></Then>
