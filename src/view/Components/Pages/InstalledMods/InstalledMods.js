@@ -156,7 +156,7 @@ export default class InstalledMods extends React.Component {
                     width: '150px'
                   }}
                 >
-                  <If condition={row.hasUpdate == true}>
+                  <If condition={row.hasUpdate}>
                     <Then><FlatButton label="Update" onTouchTap={() => ModManager.updateMod({name: row.name, version: row.version})} /></Then>
                   </If>
                 </TableRowColumn>

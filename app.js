@@ -1,6 +1,7 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
 const url = require('url')
+require('electron-reload')(__dirname)
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -12,11 +13,11 @@ function createWindow () {
 
   // and load the index.html of the app.
   win.loadURL(url.format({
-    pathname: path.join(__dirname, '../lib/view/index.html'),
+    pathname: path.join(__dirname, './view/index.html'),
     protocol: 'file:',
     slashes: true
   }))
-  
+
   // Open the DevTools.
   if (process.env.NODE_ENV !== 'production') {
     win.webContents.openDevTools()

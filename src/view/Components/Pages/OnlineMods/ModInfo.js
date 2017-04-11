@@ -90,6 +90,7 @@ export default class ModInfo extends React.Component {
                 let mod = this.state.mod
                 mod.version = this.state.mod.releases[this.state.selectedRelease].version
                 ModManager.downloadMod(mod)
+                this.close()
               }} />
             </CardActions>
             <CardText>

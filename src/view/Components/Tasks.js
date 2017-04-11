@@ -10,7 +10,7 @@ import FlatButton from 'material-ui/FlatButton'
 let tasks = []
 let currentId = 0
 let inError = false
-
+let doneTimeout
 let tasksInstance
 
 export default class Tasks extends React.Component {
@@ -24,7 +24,7 @@ export default class Tasks extends React.Component {
       tasks: [],
       isLoading: false,
       isOpen: false,
-      action: "",
+      action: " ",
       bottom: '-40px',
       opened: 0,
       background: '#212121',
@@ -50,10 +50,8 @@ export default class Tasks extends React.Component {
   }
 
   finishTask(id) {
-    setTimeout(() => {
-      tasks = tasks.filter(task => task.id != id)
-      this.updateTasks()
-    }, 1500)
+    tasks = tasks.filter(task => task.id != id)
+    this.updateTasks()
   }
 
   showError(message) {
@@ -63,7 +61,7 @@ export default class Tasks extends React.Component {
       tasks: [],
       isLoading: false,
       isOpen: false,
-      action: "",
+      action: " ",
       bottom: 0,
       opened: 0,
       background: '#FFB300',
@@ -86,6 +84,8 @@ export default class Tasks extends React.Component {
 
     let messages = [...new Set(tasks.map(task => task.message))]
 
+    clearTimeout(doneTimeout)
+
     if (messages.length > 1) {
       this.setState({
         message: `${messages.length} tasks running`,
@@ -101,7 +101,7 @@ export default class Tasks extends React.Component {
         tasks: messages,
         isLoading: true,
         isOpen: true,
-        action: "",
+        action: " ",
         bottom: 0,
         opened: 0
       })
@@ -112,16 +112,18 @@ export default class Tasks extends React.Component {
         opened: 0
       })
 
-      setTimeout(() => {
-        this.setState({
-          message: "",
-          tasks: [],
-          isLoading: false,
-          isOpen: false,
-          action: "",
-          bottom: '-40px',
-          opened: 0
-        })
+      doneTimeout = setTimeout(() => {
+        if (messages.length == 0) {
+          this.setState({
+            message: "",
+            tasks: [],
+            isLoading: false,
+            isOpen: false,
+            action: " ",
+            bottom: '-40px',
+            opened: 0
+          })
+        }
       }, 1000)
     }
 

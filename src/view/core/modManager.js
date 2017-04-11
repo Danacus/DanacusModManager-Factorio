@@ -1,11 +1,13 @@
 
 import InstalledMods from '../Components/Pages/InstalledMods/InstalledMods'
 import OnlineMods from '../Components/Pages/OnlineMods/OnlineMods'
-import api from 'node-factorio-api'
+import api from '../api/node-factorio-api'
 import Tasks from '../Components/Tasks';
+import Dialog from '../Components/Dialog';
 import $ from 'jquery'
 import semver from 'semver'
 import objectJoin from 'object-join'
+import {Filters, Sorters} from './utils/listUtils'
 
 export default class ModManager {
   static init() {
@@ -106,6 +108,7 @@ export default class ModManager {
         if (mod !== -1) {
           this.mods[mod] = objectJoin(this.mods[mod], result)
         } else {
+          result.hasUpdate = false
           this.mods.push(result)
         }
       })
@@ -117,14 +120,16 @@ export default class ModManager {
     })
   }
 
-  static checkUpdates() {
+  static checkUpdates(mods = this.mods.filter(x => x.version != null)) {
     let id = Tasks.getInstance().addTask("Checking for Updates")
-    api.checkUpdates(this.mods.filter(x => x.version != null).map(mod => {return {name: mod.name, version: mod.version}})).then((list) => {
+    api.checkUpdates(mods).then((list) => {
       Tasks.getInstance().finishTask(id)
       this.mods = this.mods.map((item) => {
-        item = objectJoin(item, list.find(x => x.name == item.name))
-        item.latest_release = list.find(x => x.name == item.name).releases[0]
-        item.hasUpdate = list.find(x => x.name == item.name).hasUpdate
+        if (list.find(x => x.name == item.name)) {
+          console.log(list.find(x => x.name == item.name).hasUpdate);
+          item = objectJoin(item, list.find(x => x.name == item.name))
+          item.latest_release = list.find(x => x.name == item.name).releases[0]
+        }
         return item
       })
       this.checkingForUpdates = false
@@ -178,83 +183,120 @@ export default class ModManager {
 
   static downloadMod(mod) {
     let id = Tasks.getInstance().addTask(`Downloading mod: ${mod.name}`)
+
+    // Download the mod
     api.downloadMod(mod).then((onlineMod) => {
-      let installedVersion = mod.version ? mod.version : onlineMod.releases[0].version
-
-      this.mods = this.mods.map((x) => {
-        if (x.name == onlineMod.name) {
-          x.version = installedVersion
-        }
-        return x
-      })
-
-      let newMod
-
-      if (!this.mods.find(x => x.name == onlineMod.name)) {
-        newMod = {
-          local: {
-            enabled: true,
-            name: onlineMod.name,
-            version: installedVersion
-          },
-          online: {
-            full: onlineMod,
-            latest_release: onlineMod.releases[0]
-          }
-        }
-        this.mods.push(newMod)
-        this.mods = this.mods.sort(compare)
-      } else {
-        newMod = this.mods.find(x => x.name == onlineMod.name)
-      }
-
-      this.checkUpdate({name: newMod.name, version: newMod.version})
-
-      this.saveModList()
+      this.addDownloadedMod(onlineMod, mod.version)
+      this.checkUpdate(mod)
       Tasks.getInstance().finishTask(id)
-      this.updateOnlineModsTable()
+      api.getDependencies(mod).then((mods) => {
+        if (mods.length > 0) {
+          Dialog.getInstance().showDialog(
+            `Download dependencies for ${mod.name}?`,
+            `Dependencies: \n ${mods.map(mod => '- ' + mod.name).join('\n')}`,
+            ['No', 'Yes']
+          ).then(action => {
+            if (action == 'Yes') {
+              this.downloadDependencies(mod)
+            }
+          })
+        }
+      })
     }).catch((err) => {
       Tasks.getInstance().showError("Error! " + err)
       console.error(err)
     })
   }
 
+  static downloadDependencies(mod) {
+    let id = Tasks.getInstance().addTask(`Downloading dependencies for: ${mod.name}`)
+    let dependencies
+    let downloadedMods = []
+
+    // Load all its dependencies
+    api.getDependencies(mod).then((mods) => {
+      dependencies = mods
+      // Get installed mods
+      let installedMods = this.mods.filter(x => x.version != null)
+      let updates = []
+
+      // Update installed dependencies (will not update if up-to-date)
+      installedMods.forEach(installedMod => {
+        let dependency = dependencies.find(mod => mod.name == installedMod.name)
+        if (dependency) {
+          updates.push(installedMod)
+
+          // Remove them from dependencies
+          dependencies = dependencies.splice(dependencies.indexOf(dependency), 1)
+        }
+      })
+      return api.updateMods(updates)
+    }).then((updatedMods) => {
+      this.checkUpdates(updatedMods.map(updatedMod => {
+        updatedMod.version = updatedMod.releases[0].version
+        return updatedMod
+      }))
+      downloadedMods = downloadedMods.concat(updatedMods)
+
+      // Download remaining dependencies
+      return api.downloadMods(dependencies)
+    }).then((downloadedDependencies) => {
+      downloadedMods = downloadedMods.concat(downloadedDependencies)
+
+      // Update the mod list
+      downloadedMods.forEach(downloadedMod => {
+        this.addDownloadedMod(downloadedMod)
+      })
+
+      // Sort the mod list
+      this.mods = this.mods.sort(compare)
+
+      // Save the mod list
+      this.saveModList()
+      Tasks.getInstance().finishTask(id)
+
+      // Update the tables
+      this.updateInstalledModsTable()
+      this.updateOnlineModsTable()
+    }).catch(err => {
+      Tasks.getInstance().showError("Error! " + err)
+      console.error(err)
+    })
+  }
+
+  static addDownloadedMod(onlineMod, installedVersion = onlineMod.releases[0].version) {
+    this.mods = this.mods.map((x) => {
+      if (x.name == onlineMod.name) {
+        if (x.enabled == null) {
+          x.enabled = true
+        }
+        x.version = installedVersion
+      }
+      return x
+    })
+  }
+
   static updateInstalledModsTable() {
-    let list = this.mods.filter(x => (
-      x.version != null
-    ))
-    list = list.filter(x => (
-      x.name.toLowerCase().includes(this.installedQuery) ||
-      x.title.toLowerCase().includes(this.installedQuery)
-    ))
+    let list = this.mods.filter(Filters.installed)
+    list = Filters.search(list, this.installedQuery)
     InstalledMods.getInstance().setTable(list)
   }
 
   static updateOnlineModsTable() {
-    let list = this.mods.filter(x => x.inList == true)
+    let list = this.mods.filter(Filters.online)
     let sorter
     switch (this.onlineSort) {
       case 'top':
-        sorter = (a, b) => b.downloads_count - a.downloads_count
+        sorter = Sorters.downloads
         break
       case 'alpha':
-        sorter = (a, b) => {
-          var nameA = a.name.toUpperCase()
-          var nameB = b.name.toUpperCase()
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-          return 0;
-        }
+        sorter = Sorters.alphabetically
         break
       case 'updated':
-        sorter = (a, b) => (a.updated_at > b.updated_at) ? -1 : ((a.online.updated_at < b.online.updated_at) ? 1 : 0)
+        sorter = Sorters.updated
         break
       default:
-        sorter = (a, b) => b.downloads_count - a.downloads_count
+        sorter = Sorters.updated
     }
     list = list.sort(sorter)
     OnlineMods.getInstance().setTable(list)
@@ -271,18 +313,7 @@ export default class ModManager {
   }
 
   static saveModList() {
-    api.saveModList(
-      this.mods
-      .filter(x => (
-        x.enabled != null
-      ))
-      .map(x => {
-        return {
-          name: x.name,
-          enabled: x.enabled
-        }
-      })
-    ).then(() => {
+    api.saveModList(Filters.toModList(this.mods)).then(() => {
       this.updateInstalledModsTable()
     })
   }

@@ -12,8 +12,10 @@ import {fullBlack, grey500, grey600, grey700, grey800, grey900, amber500, amber6
 import Main from './main'
 import TabsNav from './Components/Pages/TabsNav'
 import Tasks from './Components/Tasks'
+import Dialog from './Components/Dialog'
+require('./styles.less')
 
-import api from 'node-factorio-api'
+import api from './api/node-factorio-api'
 api.init("/home/daan/.factorio/mods", false)
 api.setSavesPath('/home/daan/.factorio/saves')
 api.authenticate({username: 'Danacus', token: '583051c5259eec328eb9ebaa1655a8', require_ownership: true}).then(() => {
@@ -45,6 +47,7 @@ api.authenticate({username: 'Danacus', token: '583051c5259eec328eb9ebaa1655a8', 
       <div>
         <TabsNav></TabsNav>
         <Tasks></Tasks>
+        <Dialog></Dialog>
       </div>
     </MuiThemeProvider>,
     document.getElementById('root')
