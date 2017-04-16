@@ -1,0 +1,35 @@
+@import "../../colors.scss";
+
+.tabs {
+  margin-bottom: 20px;
+}
+
+
+.tab {
+  text-align: center;
+  height: 50px;
+  line-height: 50px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  background: $color-background;
+}
+
+.lineContainer {
+  display: flex;
+  justify-content: center;
+  background: $color-background;
+  position: relative;
+  z-index: 5;
+}
+
+.tab.active>.lineContainer>.line {
+  flex-grow: 0.7;
+}
+
+.tab>.lineContainer>.line {
+  flex-grow: 0;
+  height: 2px;
+  background: $color-accent;
+  transition: all 0.3s ease;
+}

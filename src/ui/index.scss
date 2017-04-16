@@ -1,0 +1,21 @@
+@import "colors.scss";
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: $color-background;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  user-select: none;
+}
+
+::-webkit-scrollbar
+{
+	width: 2px;
+}
+
+::-webkit-scrollbar-thumb
+{
+	background-color: $color-accent;
+}

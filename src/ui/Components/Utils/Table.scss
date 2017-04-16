@@ -1,0 +1,46 @@
+@import "../../colors.scss";
+@import '../../pretty.scss';
+
+.table {
+    width: 100%;
+    border-spacing: 0;
+
+    tbody,
+    td,
+    th,
+    thead,
+    tr {
+        display: block;
+    }
+
+    tbody tr {
+        cursor: pointer;
+    }
+
+    thead tr {
+        width: calc(100% - 16px);
+    }
+
+    tr:after {
+        content: ' ';
+        display: block;
+        visibility: hidden;
+        clear: both;
+    }
+
+    tbody {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    tbody td,
+    thead th {
+        float: left;
+        padding: 15px;
+        height: 20px;
+    }
+
+    thead th {
+        text-align: left;
+    }
+}
